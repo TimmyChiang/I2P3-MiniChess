@@ -12,11 +12,59 @@
  * 
  * @return int 
  */
-int State::evaluate(){
+int State::evaluate(int player){
   // [TODO] design your own evaluation function
-  // 所有的 move 都在 this -> legal_actions 裡
-  for (auto mv: legal_actions) std::cout << "(" << mv.first.first << ", " << mv.first.second << ") -> (" << mv.second.first << ", " << mv.second.second << ")\n";
-  return 0;
+  // King(6): 1e9, Queen(5): 20, Bishop(4): 8, Knight(3): 7, Rook(2): 6, Pawn(1): 2
+  int myscore = 0;
+  for (int i = 0; i < BOARD_H; ++i) {
+    for (int j = 0; j < BOARD_W; ++j) {
+      switch (this -> board.board[player][i][j]) {
+        case 1:
+          myscore += 2;
+          break;
+        case 2:
+          myscore += 6;
+          break;
+        case 3:
+          myscore += 7;
+          break;
+        case 4:
+          myscore += 8;
+          break;
+        case 5:
+          myscore += 20;
+          break;
+        case 6:
+          myscore += 1e9;
+          break;
+        default:
+          break;
+      }
+      switch (this -> board.board[1-player][i][j]) {
+        case 1:
+          myscore -= 2;
+          break;
+        case 2:
+          myscore -= 6;
+          break;
+        case 3:
+          myscore -= 7;
+          break;
+        case 4:
+          myscore -= 8;
+          break;
+        case 5:
+          myscore -= 20;
+          break;
+        case 6:
+          myscore -= 1e9;
+          break;
+        default:
+          break;
+      }
+    }
+  }
+  return myscore;
 }
 
 
