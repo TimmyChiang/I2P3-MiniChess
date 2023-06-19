@@ -6,6 +6,7 @@
 #include <vector>
 #include <cassert>
 #include <cstdint>
+#include <algorithm>
 
 #include "config.hpp"
 

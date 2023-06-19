@@ -1,6 +1,7 @@
 #include <iostream>
 #include <sstream>
 #include <cstdint>
+#include <algorithm>
 
 #include "./state.hpp"
 #include "../config.hpp"
@@ -13,6 +14,8 @@
  */
 int State::evaluate(){
   // [TODO] design your own evaluation function
+  // 所有的 move 都在 this -> legal_actions 裡
+  for (auto mv: legal_actions) std::cout << "(" << mv.first.first << ", " << mv.first.second << ") -> (" << mv.second.first << ", " << mv.second.second << ")\n";
   return 0;
 }
 
@@ -27,15 +30,17 @@ State* State::next_state(Move move){
   Board next = this->board;
   Point from = move.first, to = move.second;
   
-  int8_t moved = next.board[this->player][from.first][from.second];
+  // moved: 代表當前的旗子
+  int8_t moved = next.board[this->player][from.first][from.second]; 
   //promotion for pawn
   if(moved == 1 && (to.first==BOARD_H-1 || to.first==0)){
     moved = 5;
   }
+  // 吃掉對方的旗子
   if(next.board[1-this->player][to.first][to.second]){
     next.board[1-this->player][to.first][to.second] = 0;
   }
-  
+  // 更新旗子的位置
   next.board[this->player][from.first][from.second] = 0;
   next.board[this->player][to.first][to.second] = moved;
   
@@ -46,7 +51,7 @@ State* State::next_state(Move move){
   return next_state;
 }
 
-
+// 城堡 + 主教 + 皇后移動位置
 static const int move_table_rook_bishop[8][7][2] = {
   {{0, 1}, {0, 2}, {0, 3}, {0, 4}, {0, 5}, {0, 6}, {0, 7}},
   {{0, -1}, {0, -2}, {0, -3}, {0, -4}, {0, -5}, {0, -6}, {0, -7}},
@@ -57,12 +62,14 @@ static const int move_table_rook_bishop[8][7][2] = {
   {{-1, 1}, {-2, 2}, {-3, 3}, {-4, 4}, {-5, 5}, {-6, 6}, {-7, 7}},
   {{-1, -1}, {-2, -2}, {-3, -3}, {-4, -4}, {-5, -5}, {-6, -6}, {-7, -7}},
 };
+// 騎士移動位置
 static const int move_table_knight[8][2] = {
   {1, 2}, {1, -2},
   {-1, 2}, {-1, -2},
   {2, 1}, {2, -1},
   {-2, 1}, {-2, -1},
 };
+// 國王移動位置
 static const int move_table_king[8][2] = {
   {1, 0}, {0, 1}, {-1, 0}, {0, -1}, 
   {1, 1}, {1, -1}, {-1, 1}, {-1, -1},
