@@ -47,7 +47,7 @@ void write_valid_spot(std::ofstream& fout) {
     v.clear();
     v.resize(250);
     // Choose a best spot.
-    auto move = Minimax::get_move(root, 3, true, v);
+    auto move = Minimax::get_move(root, 4, true, v);
     fout << move.first.first << " " << move.first.second << " "\
          << move.second.first << " " << move.second.second << std::endl;
     
