@@ -64,12 +64,12 @@ Move Submission::get_move(State *state, int depth) {
 
     // Assume actions.size() > 0
     Move return_move = target_moves[target_moves.size() / 3];
-    
+    /*
     std::cout << "final move: (" << return_move.first.first << \
                             ", " << return_move.first.second << \
                             ") -> (" << return_move.second.first << \
                             ", " << return_move.second.second << \
                             "), value = " << value << "\n";
-
+    */
     return return_move;
 }
