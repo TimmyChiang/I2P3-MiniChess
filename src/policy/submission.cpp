@@ -18,7 +18,7 @@ const int INF = 2e9;
  * @return Move 
  */
 
-int Minimax::get_value(State *state, int depth, bool maximizingPlayer, Move move) {
+int Submission::get_value(State *state, int depth, bool maximizingPlayer, Move move) {
     if (depth == 0)
         return state -> next_state(move) -> evaluate(maximizingPlayer);
 
@@ -40,7 +40,7 @@ int Minimax::get_value(State *state, int depth, bool maximizingPlayer, Move move
     return value;
 }
 
-Move Minimax::get_move(State *state, int depth) {
+Move Submission::get_move(State *state, int depth) {
     if (!state->legal_actions.size())
         state->get_legal_actions();
 
