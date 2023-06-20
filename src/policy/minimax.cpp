@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <vector>
 #include <utility>
-#include <ctime>
 
 #include "../state/state.hpp"
 #include "./minimax.hpp"
@@ -63,11 +62,9 @@ Move Minimax::get_move(State *state, int depth) {
             target_moves.emplace_back(pp.first);
     }
 
-    srand(time(NULL));
-
     // Assume actions.size() > 0
     Move return_move = target_moves[target_moves.size() / 3];
-
+    
     std::cout << "final move: (" << return_move.first.first << \
                             ", " << return_move.first.second << \
                             ") -> (" << return_move.second.first << \
