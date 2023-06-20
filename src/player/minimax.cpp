@@ -1,12 +1,9 @@
 #include <iostream>
 #include <fstream>
-#include <vector>
-#include <map>
 
 #include "../config.hpp"
 #include "../state/state.hpp"
 #include "../policy/minimax.hpp"
-
 
 State* root;
 
@@ -42,12 +39,9 @@ void read_board(std::ifstream& fin) {
  */
 void write_valid_spot(std::ofstream& fout) {
   // Keep updating the output until getting killed.
-  std::vector< std::map<Point, int> > v;
   while(true) {
-    v.clear();
-    v.resize(250);
     // Choose a best spot.
-    auto move = Minimax::get_move(root, 4, true, v);
+    auto move = Minimax::get_move(root, 3);
     fout << move.first.first << " " << move.first.second << " "\
          << move.second.first << " " << move.second.second << std::endl;
     

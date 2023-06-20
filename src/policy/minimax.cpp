@@ -1,5 +1,10 @@
 #include <iostream>
 #include <cstdlib>
+#include <vector>
+#include <algorithm>
+#include <vector>
+#include <utility>
+#include <ctime>
 
 #include "../state/state.hpp"
 #include "./minimax.hpp"
@@ -14,86 +19,60 @@ const int INF = 2e9;
  * @return Move 
  */
 
-int getKey(const int &depth, const Point &from) {
-    return depth * 36 + from.first * 6 + from.second;
-}
-
-// default: state = root, depth = 5, maximizingPlayer = 1(true)
-Move Minimax::get_move(State *state, int depth, bool maximizingPlayer, std::vector< std::map<Point, int> > &v){
-    std::cout << "cur depth = " << depth << "\n";
-    if (!state->legal_actions.size())
-        state->get_legal_actions();
-    
-    std::vector<Move> actions = state->legal_actions;
-    for (auto mv: actions) std::cout << "(" << mv.first.first << ", " << mv.first.second << ") -> (" << mv.second.first << ", " << mv.second.second << ")\n";
-
-    if (actions.size() == 0) { // 沒有任何合法路徑可走
-
-    }
-
-    Move return_move = actions[0]; // default return move
+int Minimax::get_value(State *state, int depth, bool maximizingPlayer, Move move) {
+    if (depth == 0)
+        return state -> next_state(move) -> evaluate(maximizingPlayer);
 
     int value;
-
-    if (depth == 1) { // 目前預測的最底層
-        // call evaluate to record the total score of the currenct state
-        if (maximizingPlayer) {
-            value = -INF;
-            for (Move mv: actions) {
-                Point from = mv.first, to = mv.second;
-                int key = getKey(depth, from);
-                State newState(state -> next_state(mv) -> board, false);
-                v[key][to] = newState.evaluate(false);
-                // value = max(value, get_move(newstate, depth-1, false));
-                if (v[key][to] >= value) {  
-                    value = v[key][to];
-                    return_move = mv;
-                }
-            }
-        } else {
-            value = INF;
-            for (Move mv: actions) {
-                Point from = mv.first, to = mv.second;
-                int key = getKey(depth, from);
-                State newState(state -> next_state(mv) -> board, true);
-                // value = min(value, get_move(newstate, depth-1, true));
-                if (v[key][to] <= value) {  
-                    value = v[key][to];
-                    return_move = mv;
-                }
-            }
-        }
-        std::cout << "depth " << depth << "'s return move: (" << return_move.first.first << ", " << return_move.first.second << ") -> (" << return_move.second.first << ", " << return_move.second.second << ")\n";
-        std::cout << "value = " << value << "\n";
-        return return_move;
-    }
     
-    if (maximizingPlayer) { // 如果現在是自己的話
+    // All the actions are in state -> legal_actions
+    if (!state -> legal_actions.size())
+        state -> get_legal_actions();
+
+    if (maximizingPlayer) {
         value = -INF;
-        for (Move mv: actions) {
-            Point from = mv.first, to = mv.second;
-            int key = getKey(depth, from);
-            Move curMove = get_move(state -> next_state(mv), depth - 1, false, v);
-            // value = max(value, get_move(newstate, depth-1, false));
-            if (v[key][to] >= value) {  
-                value = v[key][to];
-                return_move = mv;
-            }
-        }
-    } else { // 如果現在是敵人的話
+        for (Move nextmove: state -> legal_actions)
+            value = std::max(value, get_value(state -> next_state(move), depth - 1, 1 - maximizingPlayer, nextmove));
+    } else {
         value = INF;
-        for (Move mv: actions) {
-            Point from = mv.first, to = mv.second;
-            int key = getKey(depth, from);
-            Move curMove = get_move(state -> next_state(mv), depth - 1, true, v);
-            // value = min(value, get_move(newstate, depth-1, true));
-            if (v[key][to] <= value) {  
-                value = v[key][to];
-                return_move = mv;
-            }
-        }
+        for (Move nextmove: state -> legal_actions)
+            value = std::min(value, get_value(state -> next_state(move), depth - 1, 1 - maximizingPlayer, nextmove));
     }
-    std::cout << "depth " << depth << "'s return move: (" << return_move.first.first << ", " << return_move.first.second << ") -> (" << return_move.second.first << ", " << return_move.second.second << ")\n";
-    std::cout << "value = " << value << "\n";
+    return value;
+}
+
+Move Minimax::get_move(State *state, int depth) {
+    if (!state->legal_actions.size())
+        state->get_legal_actions();
+
+    std::vector<Move> actions = state->legal_actions;
+
+    std::vector< std::pair<Move, int> > valid_moves;
+
+    int value = -INF, curval;
+    for (Move mv: actions) {
+        curval = get_value(state, depth, 1, mv);
+        valid_moves.emplace_back(mv, curval);
+        value = std::max(value, curval);
+    }
+
+    std::vector<Move> target_moves;
+
+    for (std::pair<Move, int> pp: valid_moves) {
+        if (pp.second == value)
+            target_moves.emplace_back(pp.first);
+    }
+
+    srand(time(NULL));
+
+    // Assume actions.size() > 0
+    Move return_move = target_moves[target_moves.size() / 3];
+
+    std::cout << "final move: (" << return_move.first.first << \
+                            ", " << return_move.first.second << \
+                            ") -> (" << return_move.second.first << \
+                            ", " << return_move.second.second << \
+                            "), value = " << value << "\n";
+
     return return_move;
 }

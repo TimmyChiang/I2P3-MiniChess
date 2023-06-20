@@ -10,5 +10,6 @@
  */
 class Minimax{
 public:
-  static Move get_move(State *state, int depth, bool maximizingPlayer, std::vector< std::map<Point, int> > &v);
+    static Move get_move(State *state, int depth);
+    static int get_value(State *state, int depth, bool maximizingPlayer, Move move);
 };
